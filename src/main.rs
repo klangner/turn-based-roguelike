@@ -6,6 +6,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
+use roguelike::configs::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use roguelike::GamePlugin; 
 use std::io::Cursor;
 use winit::window::Icon;
@@ -24,10 +25,14 @@ fn main() {
                         fit_canvas_to_parent: true,
                         // Tells wasm not to override default event handling, like F5 and Ctrl+R
                         prevent_default_event_handling: false,
+                        resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
                         ..default()
                     }),
                     ..default()
                 })
+                .set(
+                    ImagePlugin::default_nearest()
+                )
                 .set(AssetPlugin {
                     meta_check: AssetMetaCheck::Never,
                     ..default()
