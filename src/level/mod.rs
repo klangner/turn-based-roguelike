@@ -11,13 +11,14 @@ pub struct LevelPlugin;
 pub struct TileMap {
     pub width: usize,
     pub height: usize,
+    pub start_pos: UVec2,
     walkables: Vec<bool>,
 }
 
 #[derive(Component)]
 pub struct Tile;
 
-#[derive(Component, Debug)]
+#[derive(Component, Clone, Debug, PartialEq)]
 pub struct MapLocation {
     pub row: u32,
     pub col: u32
@@ -41,11 +42,16 @@ impl TileMap {
             .with(CullUnreachable::new())
             .build();  
 
-        Self { width: map.width, height: map.height, walkables: map.walkables }
+        Self { 
+            width: map.width, 
+            height: map.height, 
+            walkables: map.walkables,
+            start_pos: map.starting_point.map(|p| UVec2::new(p.x as u32, p.y as u32)).unwrap_or(UVec2::ZERO),
+        }
     }
 
-    pub fn is_walkable(&self, x: usize, y: usize) -> bool {
-        if x >= self.width || y >= self.height {
+    pub fn is_walkable(&self, x: u32, y: u32) -> bool {
+        if x >= self.width as u32 || y >= self.height as u32 {
             false
         } else {
             let idx = (y as usize) * self.width + (x as usize);
@@ -60,8 +66,8 @@ fn spawn_tilemap(
     handle: Res<TilesTextureAtlas>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for c in 0..tilemap.width {
-        for r in 0..tilemap.height {
+    for c in 0..tilemap.width as u32 {
+        for r in 0..tilemap.height as u32 {
             let x: u32 = c as u32;
             let y: u32 = WORLD_ROWS - r as u32;
             let index: usize = if tilemap.is_walkable(c, r) {0 + 7 * TILES_COLS as usize} else {0};

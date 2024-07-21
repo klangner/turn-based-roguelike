@@ -2,7 +2,7 @@ use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
 use crate::actions::Actions;
-use crate::configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS};
+use crate::configs::{WORLD_COLS, WORLD_ROWS};
 use crate::level::{MapLocation, TileMap};
 use crate::resources::RoguesTextureAtlas;
 use crate::state::GameState;
@@ -24,10 +24,9 @@ impl Plugin for PlayerPlugin {
 fn setup_player(
     mut commands: Commands,
     handle: Res<RoguesTextureAtlas>,
+    tilemap: Res<TileMap>,
 ) {
-    let row: u32 = 5;
-    let col: u32 = 5;
-    let map_location = MapLocation {row, col};
+    let map_location = MapLocation {row: tilemap.start_pos.y, col: tilemap.start_pos.x};
     let global_pos = map_location.global_position();
     commands.spawn(
         (map_location,
@@ -60,17 +59,22 @@ fn handle_player_input(
 
     if let Some(dir) = actions.player_movement {
         let (mut map_location, mut transform) = player_query.single_mut();
-        if dir.x > 0. && map_location.col < WORLD_COLS - 1 {
-            map_location.col += 1;
+        let mut new_location = map_location.clone();
+        if dir.x > 0. {
+            new_location.col = map_location.col + 1;
         } if dir.x < 0.  && map_location.col > 0 {
-            map_location.col -= 1;
-        } if dir.y < 0. && map_location.row < WORLD_ROWS - 1 {
-            map_location.row += 1;
+            new_location.col = map_location.col - 1;
+        } if dir.y < 0. {
+            new_location.row = map_location.row + 1;
         } if dir.y > 0. && map_location.row > 0 {
-            map_location.row -= 1;
+            new_location.row = map_location.row - 1;
         }
     
-        let global_pos = map_location.global_position();
-        transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+        if new_location != *map_location && tilemap.is_walkable(new_location.col, new_location.row) {
+            map_location.col = new_location.col;
+            map_location.row = new_location.row;
+            let global_pos = map_location.global_position();
+            transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+        }
     }
 }
