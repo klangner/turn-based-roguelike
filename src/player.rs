@@ -41,7 +41,5 @@ fn handle_player_input(
         } if dir.y > 0. && map_location.row > 0 {
             map_location.row -= 1;
         }
-
-        println!("Player location: {:?}", &map_location);
     }
 }

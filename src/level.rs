@@ -1,4 +1,4 @@
-use crate::configs::TILE_SIZE;
+use crate::configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS};
 use crate::resources::TilesTextureAtlas;
 use crate::GameState;
 use bevy::math::vec3;
@@ -27,8 +27,8 @@ fn spawn_tilemap(
     handle: Res<TilesTextureAtlas>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for x in 0..20 {
-        for y in 0..12 {
+    for x in 0..WORLD_COLS {
+        for y in 0..WORLD_ROWS {
             commands.spawn((
                 SpriteBundle {
                     transform: Transform::from_translation(vec3((x * TILE_SIZE) as f32, (y * TILE_SIZE) as f32, 0.0)),
@@ -50,4 +50,11 @@ fn spawn_tilemap(
     }
 
     next_state.set(GameState::Playing);
+}
+
+
+impl MapLocation {
+    pub fn global_position(&self) -> Vec2 {
+        Vec2::new((self.col * TILE_SIZE) as f32, ((WORLD_ROWS - self.row) * TILE_SIZE) as f32)
+    }
 }
