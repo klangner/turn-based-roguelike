@@ -19,7 +19,9 @@ impl Plugin for FollowCameraPlugin {
     }
 }
 
-fn setup_camera(mut commands: Commands) {
+fn setup_camera(
+    mut commands: Commands,
+) {
     commands.spawn(Camera2dBundle::default())
         .insert(FollowCamera);
 }
@@ -35,7 +37,7 @@ fn camera_follow_player(
     let mut camera_transform = camera_query.single_mut();
     let player_location = player_query.single();
     let global_pos = player_location.global_position();
-    let camera_pos = vec3(global_pos.x, global_pos.y, 0.0); 
 
-    camera_transform.translation = camera_transform.translation.lerp(camera_pos, 0.1);
+    camera_transform.translation = vec3(global_pos.x, global_pos.y, 0.);
+    // camera_transform.translation = camera_transform.translation.lerp(camera_pos, 0.1);
 }
