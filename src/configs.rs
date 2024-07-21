@@ -9,5 +9,5 @@ pub const SPRITE_SHEET_W: u32 = 21;
 pub const SPRITE_SHEET_H: u32 = 24;
 
 // World
-pub const WORLD_COLS: usize = 100;
-pub const WORLD_ROWS: usize = 80;
+pub const WORLD_COLS: u32 = 100;
+pub const WORLD_ROWS: u32 = 80;

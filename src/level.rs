@@ -8,9 +8,12 @@ use bevy::sprite::Anchor;
 pub struct LevelPlugin;
 
 #[derive(Component)]
-pub struct Tile {
-    x: u32,
-    y: u32
+pub struct Tile;
+
+#[derive(Component, Debug)]
+pub struct MapLocation {
+    pub row: u32,
+    pub col: u32
 }
 
 impl Plugin for LevelPlugin {
@@ -19,7 +22,11 @@ impl Plugin for LevelPlugin {
     }
 }
 
-fn spawn_tilemap(mut commands: Commands, handle: Res<TilesTextureAtlas>) {
+fn spawn_tilemap(
+    mut commands: Commands, 
+    handle: Res<TilesTextureAtlas>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
     for x in 0..20 {
         for y in 0..12 {
             commands.spawn((
@@ -36,8 +43,11 @@ fn spawn_tilemap(mut commands: Commands, handle: Res<TilesTextureAtlas>) {
                     layout: handle.layout.clone().unwrap(),
                     index: 0,
                 },
-                Tile {x, y},
-            ));
+                MapLocation {row: y, col: x},
+            ))
+            .insert(Tile);
         }
     }
+
+    next_state.set(GameState::Playing);
 }

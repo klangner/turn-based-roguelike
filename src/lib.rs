@@ -1,5 +1,6 @@
 #![allow(clippy::type_complexity)]
 
+mod actions;
 mod camera;
 pub mod configs;
 mod level;
@@ -9,6 +10,7 @@ mod state;
 
 use crate::resources::ResourcesPlugin;
 
+use actions::ActionsPlugin;
 use bevy::prelude::*;
 use camera::FollowCameraPlugin;
 use player::PlayerPlugin;
@@ -22,9 +24,10 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>().add_plugins((
             ResourcesPlugin,
+            LevelPlugin,
+            ActionsPlugin,
             PlayerPlugin,
             FollowCameraPlugin,
-            LevelPlugin,
         ));
     }
 }
