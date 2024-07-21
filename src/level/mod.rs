@@ -67,7 +67,7 @@ fn spawn_tilemap(
             let index: usize = if tilemap.is_walkable(c, r) {0 + 7 * TILES_COLS as usize} else {0};
             commands.spawn((
                 SpriteBundle {
-                    transform: Transform::from_xyz((x * TILE_SIZE) as f32, (y * TILE_SIZE) as f32, 0.0),
+                    transform: Transform::from_xyz((x * TILE_SIZE) as f32, ((y-1) * TILE_SIZE) as f32, 0.0),
                     texture: handle.image.clone().unwrap(),
                     sprite: Sprite {
                         anchor: Anchor::BottomLeft,
@@ -91,6 +91,6 @@ fn spawn_tilemap(
 
 impl MapLocation {
     pub fn global_position(&self) -> Vec2 {
-        Vec2::new((self.col * TILE_SIZE) as f32, ((WORLD_ROWS - self.row) * TILE_SIZE) as f32)
+        Vec2::new((self.col * TILE_SIZE) as f32, ((WORLD_ROWS - 1 - self.row) * TILE_SIZE) as f32)
     }
 }

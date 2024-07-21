@@ -1,6 +1,11 @@
+use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
-use crate::{actions::Actions, configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS}, level::{MapLocation, TileMap}, resources::RoguesTextureAtlas, state::GameState};
+use crate::actions::Actions;
+use crate::configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS};
+use crate::level::{MapLocation, TileMap};
+use crate::resources::RoguesTextureAtlas;
+use crate::state::GameState;
 
 
 pub struct PlayerPlugin;
@@ -18,17 +23,16 @@ impl Plugin for PlayerPlugin {
 
 fn setup_player(
     mut commands: Commands,
-    tilemap: Res<TileMap>,
     handle: Res<RoguesTextureAtlas>,
 ) {
     let row: u32 = 5;
     let col: u32 = 5;
-    let x = col * TILE_SIZE;
-    let y = (tilemap.height as u32 - row) * TILE_SIZE;
+    let map_location = MapLocation {row, col};
+    let global_pos = map_location.global_position();
     commands.spawn(
-        (MapLocation {row, col},
+        (map_location,
             SpriteBundle {
-                transform: Transform::from_xyz(x as f32, y as f32, 1.0),
+                transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
                 texture: handle.image.clone().unwrap(),
                 sprite: Sprite {
                     anchor: Anchor::BottomLeft,
@@ -46,7 +50,8 @@ fn setup_player(
 
 
 fn handle_player_input(
-    mut player_query: Query<&mut MapLocation, With<Player>>,
+    mut player_query: Query<(&mut MapLocation, &mut Transform), With<Player>>,
+    tilemap: Res<TileMap>,
     actions: Res<Actions>,
 ) {
     if player_query.is_empty() {
@@ -54,7 +59,7 @@ fn handle_player_input(
     }
 
     if let Some(dir) = actions.player_movement {
-        let mut map_location = player_query.single_mut();
+        let (mut map_location, mut transform) = player_query.single_mut();
         if dir.x > 0. && map_location.col < WORLD_COLS - 1 {
             map_location.col += 1;
         } if dir.x < 0.  && map_location.col > 0 {
@@ -64,5 +69,8 @@ fn handle_player_input(
         } if dir.y > 0. && map_location.row > 0 {
             map_location.row -= 1;
         }
+    
+        let global_pos = map_location.global_position();
+        transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
     }
 }
