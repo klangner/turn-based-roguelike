@@ -36,7 +36,7 @@ fn load_assets(
     );
     handle.layout = Some(texture_atlas_layouts.add(layout));
 
-    next_state.set(GameState::Playing);
+    next_state.set(GameState::GenerateLevel);
 }
 
 impl Default for TilesTextureAtlas {

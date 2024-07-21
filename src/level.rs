@@ -5,7 +5,7 @@ use bevy::math::vec3;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 
-pub struct TilemapPlugin;
+pub struct LevelPlugin;
 
 #[derive(Component)]
 pub struct Tile {
@@ -13,15 +13,13 @@ pub struct Tile {
     y: u32
 }
 
-impl Plugin for TilemapPlugin {
+impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), spawn_tilemap);
+        app.add_systems(OnEnter(GameState::GenerateLevel), spawn_tilemap);
     }
 }
 
 fn spawn_tilemap(mut commands: Commands, handle: Res<TilesTextureAtlas>) {
-    commands.spawn(Camera2dBundle::default());
-    println!("spawn tiles");
     for x in 0..20 {
         for y in 0..12 {
             commands.spawn((
