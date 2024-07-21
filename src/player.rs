@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 
-use crate::{actions::Actions, configs::{WORLD_COLS, WORLD_ROWS}, level::MapLocation, state::GameState};
+use crate::{actions::Actions, configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS}, level::{MapLocation, TileMap}, resources::RoguesTextureAtlas, state::GameState};
 
 
 pub struct PlayerPlugin;
@@ -16,8 +16,31 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-fn setup_player(mut commands: Commands) {
-    commands.spawn( MapLocation {row: 0, col: 0})
+fn setup_player(
+    mut commands: Commands,
+    tilemap: Res<TileMap>,
+    handle: Res<RoguesTextureAtlas>,
+) {
+    let row: u32 = 5;
+    let col: u32 = 5;
+    let x = col * TILE_SIZE;
+    let y = (tilemap.height as u32 - row) * TILE_SIZE;
+    commands.spawn(
+        (MapLocation {row, col},
+            SpriteBundle {
+                transform: Transform::from_xyz(x as f32, y as f32, 1.0),
+                texture: handle.image.clone().unwrap(),
+                sprite: Sprite {
+                    anchor: Anchor::BottomLeft,
+                    ..Default::default()
+                },
+                ..default()
+            },
+            TextureAtlas {
+                layout: handle.layout.clone().unwrap(),
+                index: 0,
+            },
+        ))
         .insert(Player);
 }
 

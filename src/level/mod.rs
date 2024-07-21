@@ -1,4 +1,4 @@
-use crate::configs::{SPRITE_SHEET_W, TILE_SIZE, WORLD_COLS, WORLD_ROWS};
+use crate::configs::{TILES_COLS, TILE_SIZE, WORLD_COLS, WORLD_ROWS};
 use crate::resources::TilesTextureAtlas;
 use crate::GameState;
 use bevy::prelude::*;
@@ -9,8 +9,8 @@ pub struct LevelPlugin;
 
 #[derive(Resource)]
 pub struct TileMap {
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
     walkables: Vec<bool>,
 }
 
@@ -64,7 +64,7 @@ fn spawn_tilemap(
         for r in 0..tilemap.height {
             let x: u32 = c as u32;
             let y: u32 = WORLD_ROWS - r as u32;
-            let index: usize = if tilemap.is_walkable(c, r) {0 + 7 * SPRITE_SHEET_W as usize} else {0};
+            let index: usize = if tilemap.is_walkable(c, r) {0 + 7 * TILES_COLS as usize} else {0};
             commands.spawn((
                 SpriteBundle {
                     transform: Transform::from_xyz((x * TILE_SIZE) as f32, (y * TILE_SIZE) as f32, 0.0),

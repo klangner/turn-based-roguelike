@@ -11,15 +11,41 @@ pub struct TilesTextureAtlas {
     pub image: Option<Handle<Image>>,
 }
 
+#[derive(Resource)]
+pub struct RoguesTextureAtlas {
+    pub layout: Option<Handle<TextureAtlasLayout>>,
+    pub image: Option<Handle<Image>>,
+}
+
 impl Plugin for ResourcesPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TilesTextureAtlas::default())
-            .add_systems(OnEnter(GameState::Loading), load_assets);
+            .insert_resource(RoguesTextureAtlas::default())
+            .add_systems(OnEnter(GameState::Loading), load_rogues)
+            .add_systems(OnEnter(GameState::Loading), load_tiles);
     }
 }
 
 
-fn load_assets(
+fn load_rogues(
+    mut handle: ResMut<RoguesTextureAtlas>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+) {
+    handle.image = Some(asset_server.load(ROGUES_IMAGE_PATH));
+
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2::new(TILE_SIZE, TILE_SIZE),
+        ROGUES_COLS,
+        ROGUES_ROWS,
+        None,
+        None,
+    );
+    handle.layout = Some(texture_atlas_layouts.add(layout));
+}
+
+
+fn load_tiles(
     mut handle: ResMut<TilesTextureAtlas>,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
@@ -29,8 +55,8 @@ fn load_assets(
 
     let layout = TextureAtlasLayout::from_grid(
         UVec2::new(TILE_SIZE, TILE_SIZE),
-        SPRITE_SHEET_W,
-        SPRITE_SHEET_H,
+        TILES_COLS,
+        TILES_ROWS,
         None,
         None,
     );
@@ -39,7 +65,18 @@ fn load_assets(
     next_state.set(GameState::GenerateLevel);
 }
 
+
 impl Default for TilesTextureAtlas {
+    fn default() -> Self {
+        Self {
+            layout: None,
+            image: None,
+        }
+    }
+}
+
+
+impl Default for RoguesTextureAtlas {
     fn default() -> Self {
         Self {
             layout: None,
