@@ -53,6 +53,11 @@ fn camera_follow_player(
     } else if global_pos.y + half_win_height >= (WORLD_ROWS * TILE_SIZE) as f32 {
         global_pos.y = (WORLD_ROWS * TILE_SIZE) as f32 - half_win_height;
     }
-
-    camera_transform.translation = vec3(global_pos.x, global_pos.y, 0.);
+    
+    let new_translation = vec3(global_pos.x, global_pos.y, 0.);
+    if camera_transform.translation.distance(new_translation) < 2.0 * TILE_SIZE as f32 {
+        camera_transform.translation = camera_transform.translation.lerp(new_translation, 0.1);
+    } else {
+        camera_transform.translation = new_translation;
+    }
 }

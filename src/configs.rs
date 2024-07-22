@@ -12,5 +12,5 @@ pub const ROGUES_COLS: u32 = 5;
 pub const ROGUES_ROWS: u32 = 5;
 
 // World
-pub const WORLD_COLS: u32 = 42;//100;
-pub const WORLD_ROWS: u32 = 30;//80;
+pub const WORLD_COLS: u32 = 100;
+pub const WORLD_ROWS: u32 = 80;

@@ -2,7 +2,6 @@ use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
 use crate::actions::Actions;
-use crate::configs::{WORLD_COLS, WORLD_ROWS};
 use crate::level::{MapLocation, TileMap};
 use crate::resources::RoguesTextureAtlas;
 use crate::state::GameState;
