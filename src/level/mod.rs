@@ -1,16 +1,20 @@
+use layer::WalkableLayer;
+use poi::{AreaStartingPosition, XStart, YStart};
+use rand::prelude::*;
 use crate::configs::{TILES_COLS, TILE_SIZE, WORLD_COLS, WORLD_ROWS};
 use crate::resources::TilesTextureAtlas;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use mapgen::*;
+use rooms::{NearestCorridors, SimpleRooms};
 
 pub struct LevelPlugin;
 
 #[derive(Resource)]
 pub struct TileMap {
-    pub width: usize,
-    pub height: usize,
+    pub width: u32,
+    pub height: u32,
     pub start_pos: UVec2,
     walkables: Vec<bool>,
 }
@@ -35,26 +39,31 @@ impl Plugin for LevelPlugin {
 
 impl TileMap {
     fn new() -> Self {
-        let map = MapBuilder::new(WORLD_COLS as usize, WORLD_ROWS as usize)
-            .with(NoiseGenerator::uniform())
-            .with(CellularAutomata::new())
-            .with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER))
-            .with(CullUnreachable::new())
-            .build();  
+        let walkable_layer = Self::generate_map();
+        let starting_point = AreaStartingPosition::find(XStart::LEFT, YStart::TOP, &walkable_layer);
 
         Self { 
-            width: map.width, 
-            height: map.height, 
-            walkables: map.walkables,
-            start_pos: map.starting_point.map(|p| UVec2::new(p.x as u32, p.y as u32)).unwrap_or(UVec2::ZERO),
+            width: walkable_layer.width, 
+            height: walkable_layer.height, 
+            walkables: walkable_layer.tiles,
+            start_pos: UVec2::new(starting_point.x as u32, starting_point.y as u32),
         }
+    }
+    
+    fn generate_map() -> WalkableLayer {
+        let mut rng = StdRng::seed_from_u64(907647352);
+        let sr = SimpleRooms::new(30, 5, 20);
+        let corridors = NearestCorridors::default();
+        let rooms = sr.generate(WORLD_COLS, WORLD_ROWS, &mut rng);
+        let map = corridors.generate(&rooms);
+        map.walkable_layer
     }
 
     pub fn is_walkable(&self, x: u32, y: u32) -> bool {
         if x >= self.width as u32 || y >= self.height as u32 {
             false
         } else {
-            let idx = (y as usize) * self.width + (x as usize);
+            let idx = (y * self.width + x) as usize;
             self.walkables[idx]
         }
     }
@@ -66,10 +75,10 @@ fn spawn_tilemap(
     handle: Res<TilesTextureAtlas>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for c in 0..tilemap.width as u32 {
-        for r in 0..tilemap.height as u32 {
-            let x: u32 = c as u32;
-            let y: u32 = WORLD_ROWS - r as u32;
+    for c in 0..tilemap.width {
+        for r in 0..tilemap.height {
+            let x: u32 = c;
+            let y: u32 = WORLD_ROWS - r;
             let index: usize = if tilemap.is_walkable(c, r) {0 + 7 * TILES_COLS as usize} else {0};
             commands.spawn((
                 SpriteBundle {

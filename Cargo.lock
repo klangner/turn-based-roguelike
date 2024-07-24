@@ -2440,9 +2440,7 @@ dependencies = [
 
 [[package]]
 name = "mapgen"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f4ea999281ec8fddc8289c1f7f388c7b05c1f402658f3bc9d6d8bf025425784"
+version = "0.7.0"
 dependencies = [
  "rand",
 ]
