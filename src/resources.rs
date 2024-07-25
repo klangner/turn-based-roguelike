@@ -5,13 +5,13 @@ use crate::state::GameState;
 
 pub struct ResourcesPlugin;
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct TilesTextureAtlas {
     pub layout: Option<Handle<TextureAtlasLayout>>,
     pub image: Option<Handle<Image>>,
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct RoguesTextureAtlas {
     pub layout: Option<Handle<TextureAtlasLayout>>,
     pub image: Option<Handle<Image>>,
@@ -61,22 +61,4 @@ fn load_tiles(
     handle.layout = Some(texture_atlas_layouts.add(layout));
 
     next_state.set(GameState::GenerateLevel);
-}
-
-impl Default for TilesTextureAtlas {
-    fn default() -> Self {
-        Self {
-            layout: None,
-            image: None,
-        }
-    }
-}
-
-impl Default for RoguesTextureAtlas {
-    fn default() -> Self {
-        Self {
-            layout: None,
-            image: None,
-        }
-    }
 }

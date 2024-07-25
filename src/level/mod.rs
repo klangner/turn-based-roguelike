@@ -45,21 +45,21 @@ impl TileMap {
             width: walkable_layer.width,
             height: walkable_layer.height,
             walkables: walkable_layer.tiles,
-            start_pos: UVec2::new(starting_point.x as u32, starting_point.y as u32),
+            start_pos: UVec2::new(starting_point.x, starting_point.y),
         }
     }
 
     fn generate_map() -> WalkableLayer {
         let mut rng = Rng::with_seed(907647352);
         let sr = SimpleRooms::new(30, 5, 20);
-        let corridors = NearestCorridors::default();
+        let corridors = NearestCorridors::new();
         let rooms = sr.generate(WORLD_COLS, WORLD_ROWS, &mut rng);
         let map = corridors.generate(&rooms);
         map.walkable_layer
     }
 
     pub fn is_walkable(&self, x: u32, y: u32) -> bool {
-        if x >= self.width as u32 || y >= self.height as u32 {
+        if x >= self.width || y >= self.height {
             false
         } else {
             let idx = (y * self.width + x) as usize;
@@ -79,7 +79,7 @@ fn spawn_tilemap(
             let x: u32 = c;
             let y: u32 = WORLD_ROWS - r;
             let index: usize = if tilemap.is_walkable(c, r) {
-                0 + 7 * TILES_COLS as usize
+                7 * TILES_COLS as usize
             } else {
                 0
             };
