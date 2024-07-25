@@ -13,10 +13,9 @@ use crate::resources::ResourcesPlugin;
 use actions::ActionsPlugin;
 use bevy::prelude::*;
 use camera::FollowCameraPlugin;
+use level::LevelPlugin;
 use player::PlayerPlugin;
 use state::GameState;
-use level::LevelPlugin;
-
 
 pub struct GamePlugin;
 

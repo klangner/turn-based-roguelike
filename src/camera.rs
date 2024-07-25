@@ -1,13 +1,16 @@
 use bevy::{math::vec3, prelude::*, window::PrimaryWindow};
 
-use crate::{configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS}, level::MapLocation, player::Player, state::GameState};
-
+use crate::{
+    configs::{TILE_SIZE, WORLD_COLS, WORLD_ROWS},
+    level::MapLocation,
+    player::Player,
+    state::GameState,
+};
 
 pub struct FollowCameraPlugin;
 
 #[derive(Component)]
 struct FollowCamera;
-
 
 impl Plugin for FollowCameraPlugin {
     fn build(&self, app: &mut App) {
@@ -19,11 +22,9 @@ impl Plugin for FollowCameraPlugin {
     }
 }
 
-fn setup_camera(
-    mut commands: Commands,
-) {
-    commands.spawn(
-        Camera2dBundle::default())
+fn setup_camera(mut commands: Commands) {
+    commands
+        .spawn(Camera2dBundle::default())
         .insert(FollowCamera);
 }
 
@@ -53,7 +54,7 @@ fn camera_follow_player(
     } else if global_pos.y + half_win_height >= (WORLD_ROWS * TILE_SIZE) as f32 {
         global_pos.y = (WORLD_ROWS * TILE_SIZE) as f32 - half_win_height;
     }
-    
+
     let new_translation = vec3(global_pos.x, global_pos.y, 0.);
     if camera_transform.translation.distance(new_translation) < 2.0 * TILE_SIZE as f32 {
         camera_transform.translation = camera_transform.translation.lerp(new_translation, 0.1);

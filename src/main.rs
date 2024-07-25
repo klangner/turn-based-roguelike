@@ -7,7 +7,7 @@ use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
 use roguelike::configs::{WINDOW_HEIGHT, WINDOW_WIDTH};
-use roguelike::GamePlugin; 
+use roguelike::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
@@ -30,9 +30,7 @@ fn main() {
                     }),
                     ..default()
                 })
-                .set(
-                    ImagePlugin::default_nearest()
-                )
+                .set(ImagePlugin::default_nearest())
                 .set(AssetPlugin {
                     meta_check: AssetMetaCheck::Never,
                     ..default()

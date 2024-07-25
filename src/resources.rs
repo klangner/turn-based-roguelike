@@ -26,7 +26,6 @@ impl Plugin for ResourcesPlugin {
     }
 }
 
-
 fn load_rogues(
     mut handle: ResMut<RoguesTextureAtlas>,
     asset_server: Res<AssetServer>,
@@ -43,7 +42,6 @@ fn load_rogues(
     );
     handle.layout = Some(texture_atlas_layouts.add(layout));
 }
-
 
 fn load_tiles(
     mut handle: ResMut<TilesTextureAtlas>,
@@ -65,7 +63,6 @@ fn load_tiles(
     next_state.set(GameState::GenerateLevel);
 }
 
-
 impl Default for TilesTextureAtlas {
     fn default() -> Self {
         Self {
@@ -74,7 +71,6 @@ impl Default for TilesTextureAtlas {
         }
     }
 }
-
 
 impl Default for RoguesTextureAtlas {
     fn default() -> Self {

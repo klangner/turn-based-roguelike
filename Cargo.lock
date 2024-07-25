@@ -2441,6 +2441,7 @@ dependencies = [
 [[package]]
 name = "mapgen"
 version = "0.7.0"
+source = "git+https://github.com/klangner/mapgen.rs#27a1866c7814b5eac2032171c2eab2565ace19e9"
 dependencies = [
  "fastrand",
 ]
