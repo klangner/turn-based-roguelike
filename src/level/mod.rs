@@ -1,6 +1,6 @@
+use fastrand::Rng;
 use layer::WalkableLayer;
 use poi::{AreaStartingPosition, XStart, YStart};
-use rand::prelude::*;
 use crate::configs::{TILES_COLS, TILE_SIZE, WORLD_COLS, WORLD_ROWS};
 use crate::resources::TilesTextureAtlas;
 use crate::GameState;
@@ -51,7 +51,7 @@ impl TileMap {
     }
     
     fn generate_map() -> WalkableLayer {
-        let mut rng = StdRng::seed_from_u64(907647352);
+        let mut rng = Rng::with_seed(907647352);
         let sr = SimpleRooms::new(30, 5, 20);
         let corridors = NearestCorridors::default();
         let rooms = sr.generate(WORLD_COLS, WORLD_ROWS, &mut rng);
