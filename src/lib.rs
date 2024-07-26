@@ -4,6 +4,7 @@ mod actions;
 mod camera;
 pub mod configs;
 mod level;
+mod monsters;
 mod player;
 mod resources;
 mod state;
@@ -14,6 +15,7 @@ use actions::ActionsPlugin;
 use bevy::prelude::*;
 use camera::FollowCameraPlugin;
 use level::LevelPlugin;
+use monsters::MonsterPlugin;
 use player::PlayerPlugin;
 use state::GameState;
 
@@ -25,6 +27,7 @@ impl Plugin for GamePlugin {
             ResourcesPlugin,
             LevelPlugin,
             ActionsPlugin,
+            MonsterPlugin,
             PlayerPlugin,
             FollowCameraPlugin,
         ));
