@@ -1,6 +1,8 @@
+use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
 use crate::level::{MapLocation, TileMap};
+use crate::player::Player;
 use crate::resources::MonstersTextureAtlas;
 use crate::state::GameState;
 
@@ -11,10 +13,10 @@ pub struct Monster;
 
 impl Plugin for MonsterPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), setup_monster)
+        app.add_systems(OnEnter(GameState::InitLevel), setup_monster)
             .add_systems(
                 Update,
-                make_move.run_if(in_state(GameState::Playing)),
+                make_move.run_if(in_state(GameState::MonsterTurn)),
             );
     }
 }
@@ -32,7 +34,7 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
             .spawn((
                 map_location,
                 SpriteBundle {
-                    transform: Transform::from_xyz(global_pos.x, global_pos.y, 0.0),
+                    transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
                     texture: handle.image.clone().unwrap(),
                     sprite: Sprite {
                         anchor: Anchor::BottomLeft,
@@ -67,10 +69,39 @@ fn spawn_location(_num: u32, tilemap: &Res<TileMap>, player_pos: &UVec2) -> Vec<
 }
 
 fn make_move(
-    mut _monster_query: Query<(&mut MapLocation, &mut Transform), With<Monster>>,
-    _tilemap: Res<TileMap>,
+    mut monsters_query: Query<(&mut MapLocation, &mut Transform), With<Monster>>,
+    player_query: Query<&mut MapLocation, (With<Player>, Without<Monster>)>,
+    tilemap: Res<TileMap>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
-    // if _monster_query.is_empty() {
-    //     return;
-    // }
+    if monsters_query.is_empty()  || player_query.is_empty() {
+        return;
+    }
+            
+    let player_location = player_query.single();
+    let mut taken_locations: Vec<MapLocation> = monsters_query
+        .iter()
+        .map(|(loc, _)| loc.clone())
+        .collect();
+
+    taken_locations.push(player_location.clone());
+
+    for (mut monster_location, mut transform) in monsters_query.iter_mut() {
+        let new_location = MapLocation {
+            col: monster_location.col + 1,
+            row: monster_location.row,
+        };
+
+        if new_location != *monster_location 
+            && tilemap.is_walkable(new_location.col, new_location.row)
+            && taken_locations.iter().all(|l| &new_location != l)
+        {
+            monster_location.col = new_location.col;
+            monster_location.row = new_location.row;
+            let global_pos = monster_location.global_position();
+            transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+        }
+    }
+
+    next_state.set(GameState::PlayerTurn);
 }

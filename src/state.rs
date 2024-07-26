@@ -6,7 +6,9 @@ pub enum GameState {
     #[default]
     Loading,
     // Generate map and load level
-    GenerateLevel,
-    // During this State the actual game logic is executed
-    Playing,
+    InitLevel,
+    // Allow player to issue command
+    PlayerTurn,
+    // Run Monster AI
+    MonsterTurn,
 }

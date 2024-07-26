@@ -31,8 +31,8 @@ pub struct MapLocation {
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TileMap::new())
-            .add_systems(OnEnter(GameState::GenerateLevel), spawn_tilemap)
-            .add_systems(OnEnter(GameState::GenerateLevel), spawn_tilemap);
+            .add_systems(OnEnter(GameState::InitLevel), spawn_tilemap)
+            .add_systems(Update, finish_update.run_if(in_state(GameState::InitLevel)));
     }
 }
 
@@ -72,7 +72,6 @@ fn spawn_tilemap(
     mut commands: Commands,
     tilemap: Res<TileMap>,
     handle: Res<TilesTextureAtlas>,
-    mut next_state: ResMut<NextState<GameState>>,
 ) {
     for c in 0..tilemap.width {
         for r in 0..tilemap.height {
@@ -107,8 +106,6 @@ fn spawn_tilemap(
                 .insert(Tile);
         }
     }
-
-    next_state.set(GameState::Playing);
 }
 
 impl MapLocation {
@@ -118,4 +115,8 @@ impl MapLocation {
             ((WORLD_ROWS - 1 - self.row) * TILE_SIZE) as f32,
         )
     }
+}
+
+fn finish_update(mut next_state: ResMut<NextState<GameState>>) {
+    next_state.set(GameState::PlayerTurn);
 }

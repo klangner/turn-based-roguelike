@@ -14,10 +14,10 @@ pub struct Player;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), setup_player)
+        app.add_systems(OnEnter(GameState::InitLevel), setup_player)
             .add_systems(
                 Update,
-                player_turn.run_if(in_state(GameState::Playing)),
+                player_turn.run_if(in_state(GameState::PlayerTurn)),
             );
     }
 }
@@ -53,6 +53,7 @@ fn player_turn(
     monster_query: Query<&MapLocation, (With<Monster>, Without<Player>)>,
     tilemap: Res<TileMap>,
     actions: Res<Actions>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     if player_query.is_empty() {
         return;
@@ -82,6 +83,7 @@ fn player_turn(
             map_location.row = new_location.row;
             let global_pos = map_location.global_position();
             transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+            next_state.set(GameState::MonsterTurn);
         }
     }
 }

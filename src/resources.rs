@@ -85,5 +85,5 @@ fn load_tiles(
     );
     handle.layout = Some(texture_atlas_layouts.add(layout));
 
-    next_state.set(GameState::GenerateLevel);
+    next_state.set(GameState::InitLevel);
 }
