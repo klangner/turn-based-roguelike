@@ -3,6 +3,7 @@ use bevy::{prelude::*, sprite::Anchor};
 
 use crate::actions::Actions;
 use crate::level::{MapLocation, TileMap};
+use crate::monsters::Monster;
 use crate::resources::RoguesTextureAtlas;
 use crate::state::GameState;
 
@@ -16,7 +17,7 @@ impl Plugin for PlayerPlugin {
         app.add_systems(OnEnter(GameState::Playing), setup_player)
             .add_systems(
                 Update,
-                handle_player_input.run_if(in_state(GameState::Playing)),
+                player_turn.run_if(in_state(GameState::Playing)),
             );
     }
 }
@@ -47,8 +48,9 @@ fn setup_player(mut commands: Commands, handle: Res<RoguesTextureAtlas>, tilemap
         .insert(Player);
 }
 
-fn handle_player_input(
+fn player_turn(
     mut player_query: Query<(&mut MapLocation, &mut Transform), With<Player>>,
+    monster_query: Query<&MapLocation, (With<Monster>, Without<Player>)>,
     tilemap: Res<TileMap>,
     actions: Res<Actions>,
 ) {
@@ -72,7 +74,9 @@ fn handle_player_input(
             new_location.row = map_location.row - 1;
         }
 
-        if new_location != *map_location && tilemap.is_walkable(new_location.col, new_location.row)
+        if new_location != *map_location 
+            && tilemap.is_walkable(new_location.col, new_location.row)
+            && monster_query.iter().filter(|&m| m == &new_location).count() == 0
         {
             map_location.col = new_location.col;
             map_location.row = new_location.row;
