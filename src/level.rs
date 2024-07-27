@@ -68,11 +68,7 @@ impl TileMap {
     }
 }
 
-fn spawn_tilemap(
-    mut commands: Commands,
-    tilemap: Res<TileMap>,
-    handle: Res<TilesTextureAtlas>,
-) {
+fn spawn_tilemap(mut commands: Commands, tilemap: Res<TileMap>, handle: Res<TilesTextureAtlas>) {
     for c in 0..tilemap.width {
         for r in 0..tilemap.height {
             let x: u32 = c;

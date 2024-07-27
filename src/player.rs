@@ -15,10 +15,7 @@ pub struct Player;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InitLevel), setup_player)
-            .add_systems(
-                Update,
-                player_turn.run_if(in_state(GameState::PlayerTurn)),
-            );
+            .add_systems(Update, player_turn.run_if(in_state(GameState::PlayerTurn)));
     }
 }
 
@@ -48,7 +45,7 @@ fn setup_player(mut commands: Commands, handle: Res<RoguesTextureAtlas>, tilemap
         .insert(Player);
 }
 
-fn player_turn (
+fn player_turn(
     mut player_query: Query<(&mut MapLocation, &mut Transform), With<Player>>,
     mut monster_query: Query<(&MapLocation, &mut Monster), Without<Player>>,
     tilemap: Res<TileMap>,
@@ -75,8 +72,12 @@ fn player_turn (
             new_location.row = map_location.row - 1;
         }
 
-        if new_location != *map_location && tilemap.is_walkable(new_location.col, new_location.row) {
-            if let Some((_, mut monster)) = monster_query.iter_mut().find(|(loc, _)| *loc == &new_location) {
+        if new_location != *map_location && tilemap.is_walkable(new_location.col, new_location.row)
+        {
+            if let Some((_, mut monster)) = monster_query
+                .iter_mut()
+                .find(|(loc, _)| *loc == &new_location)
+            {
                 monster.damage(1.0);
             } else {
                 map_location.col = new_location.col;

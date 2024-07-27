@@ -22,11 +22,8 @@ impl Monster {
 impl Plugin for MonsterPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InitLevel), setup_monster)
-            .add_systems(
-                Update,
-                make_move.run_if(in_state(GameState::MonsterTurn)),
-            )
-            .add_systems(OnEnter(GameState::MonsterTurn),despawn_dead_enemies);
+            .add_systems(Update, make_move.run_if(in_state(GameState::MonsterTurn)))
+            .add_systems(OnEnter(GameState::MonsterTurn), despawn_dead_enemies);
     }
 }
 
@@ -39,39 +36,39 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
             row: sp.y,
         };
         let global_pos = map_location.global_position();
-        commands
-            .spawn((
-                map_location,
-                SpriteBundle {
-                    transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
-                    texture: handle.image.clone().unwrap(),
-                    sprite: Sprite {
-                        anchor: Anchor::BottomLeft,
-                        ..Default::default()
-                    },
-                    ..default()
+        commands.spawn((
+            map_location,
+            SpriteBundle {
+                transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
+                texture: handle.image.clone().unwrap(),
+                sprite: Sprite {
+                    anchor: Anchor::BottomLeft,
+                    ..Default::default()
                 },
-                TextureAtlas {
-                    layout: handle.layout.clone().unwrap(),
-                    index: 0,
-                },
-                Monster { health: 1.0 },
-            ));
+                ..default()
+            },
+            TextureAtlas {
+                layout: handle.layout.clone().unwrap(),
+                index: 0,
+            },
+            Monster { health: 1.0 },
+        ));
     }
 }
 
 fn spawn_location(_num: u32, tilemap: &Res<TileMap>, player_pos: &UVec2) -> Vec<UVec2> {
     // Spawn some near player
     let points = [
-       UVec2::new(player_pos.x - 3, player_pos.y), 
-       UVec2::new(player_pos.x + 3, player_pos.y), 
-       UVec2::new(player_pos.x, player_pos.y - 3), 
-       UVec2::new(player_pos.x, player_pos.y + 3), 
-       UVec2::new(player_pos.x-3, player_pos.y - 3), 
-       UVec2::new(player_pos.x+3, player_pos.y + 3), 
+        UVec2::new(player_pos.x - 3, player_pos.y),
+        UVec2::new(player_pos.x + 3, player_pos.y),
+        UVec2::new(player_pos.x, player_pos.y - 3),
+        UVec2::new(player_pos.x, player_pos.y + 3),
+        UVec2::new(player_pos.x - 3, player_pos.y - 3),
+        UVec2::new(player_pos.x + 3, player_pos.y + 3),
     ];
 
-    points.iter()
+    points
+        .iter()
         .filter(|&p| tilemap.is_walkable(p.x, p.y))
         .copied()
         .collect()
@@ -86,22 +83,38 @@ fn make_move(
     if player_query.is_empty() {
         return;
     }
-            
+
     let player_location = player_query.single();
-    let mut taken_locations: Vec<MapLocation> = monsters_query
-        .iter()
-        .map(|(loc, _)| loc.clone())
-        .collect();
+    let mut taken_locations: Vec<MapLocation> =
+        monsters_query.iter().map(|(loc, _)| loc.clone()).collect();
 
     taken_locations.push(player_location.clone());
 
     for (mut monster_location, mut transform) in monsters_query.iter_mut() {
-        let new_location = MapLocation {
-            col: monster_location.col + 1,
-            row: monster_location.row,
+        let new_location = match fastrand::choice(0..5).unwrap() {
+            1 => MapLocation {
+                col: monster_location.col + 1,
+                row: monster_location.row,
+            },
+            2 => MapLocation {
+                col: monster_location.col,
+                row: monster_location.row + 1,
+            },
+            3 => MapLocation {
+                col: monster_location.col - 1,
+                row: monster_location.row,
+            },
+            4 => MapLocation {
+                col: monster_location.col,
+                row: monster_location.row - 1,
+            },
+            _ => MapLocation {
+                col: monster_location.col,
+                row: monster_location.row,
+            },
         };
 
-        if new_location != *monster_location 
+        if new_location != *monster_location
             && tilemap.is_walkable(new_location.col, new_location.row)
             && taken_locations.iter().all(|l| &new_location != l)
         {
@@ -115,8 +128,9 @@ fn make_move(
     next_state.set(GameState::PlayerTurn);
 }
 
-
-fn despawn_dead_enemies(mut commands: Commands, enemy_query: Query<(&Monster, Entity), With<Monster>>
+fn despawn_dead_enemies(
+    mut commands: Commands,
+    enemy_query: Query<(&Monster, Entity), With<Monster>>,
 ) {
     for (enemy, entity) in enemy_query.iter() {
         if enemy.health <= 0.0 {
@@ -124,4 +138,3 @@ fn despawn_dead_enemies(mut commands: Commands, enemy_query: Query<(&Monster, En
         }
     }
 }
-            
