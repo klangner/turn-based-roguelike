@@ -9,7 +9,15 @@ use crate::state::GameState;
 pub struct MonsterPlugin;
 
 #[derive(Component)]
-pub struct Monster;
+pub struct Monster {
+    pub health: f32,
+}
+
+impl Monster {
+    pub fn damage(&mut self, amount: f32) {
+        self.health -= amount;
+    }
+}
 
 impl Plugin for MonsterPlugin {
     fn build(&self, app: &mut App) {
@@ -17,7 +25,8 @@ impl Plugin for MonsterPlugin {
             .add_systems(
                 Update,
                 make_move.run_if(in_state(GameState::MonsterTurn)),
-            );
+            )
+            .add_systems(OnEnter(GameState::MonsterTurn),despawn_dead_enemies);
     }
 }
 
@@ -46,8 +55,8 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
                     layout: handle.layout.clone().unwrap(),
                     index: 0,
                 },
-            ))
-            .insert(Monster);
+                Monster { health: 1.0 },
+            ));
     }
 }
 
@@ -74,7 +83,7 @@ fn make_move(
     tilemap: Res<TileMap>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    if monsters_query.is_empty()  || player_query.is_empty() {
+    if player_query.is_empty() {
         return;
     }
             
@@ -105,3 +114,14 @@ fn make_move(
 
     next_state.set(GameState::PlayerTurn);
 }
+
+
+fn despawn_dead_enemies(mut commands: Commands, enemy_query: Query<(&Monster, Entity), With<Monster>>
+) {
+    for (enemy, entity) in enemy_query.iter() {
+        if enemy.health <= 0.0 {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+            

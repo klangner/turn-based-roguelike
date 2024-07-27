@@ -48,9 +48,9 @@ fn setup_player(mut commands: Commands, handle: Res<RoguesTextureAtlas>, tilemap
         .insert(Player);
 }
 
-fn player_turn(
+fn player_turn (
     mut player_query: Query<(&mut MapLocation, &mut Transform), With<Player>>,
-    monster_query: Query<&MapLocation, (With<Monster>, Without<Player>)>,
+    mut monster_query: Query<(&MapLocation, &mut Monster), Without<Player>>,
     tilemap: Res<TileMap>,
     actions: Res<Actions>,
     mut next_state: ResMut<NextState<GameState>>,
@@ -75,14 +75,15 @@ fn player_turn(
             new_location.row = map_location.row - 1;
         }
 
-        if new_location != *map_location 
-            && tilemap.is_walkable(new_location.col, new_location.row)
-            && monster_query.iter().filter(|&m| m == &new_location).count() == 0
-        {
-            map_location.col = new_location.col;
-            map_location.row = new_location.row;
-            let global_pos = map_location.global_position();
-            transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+        if new_location != *map_location && tilemap.is_walkable(new_location.col, new_location.row) {
+            if let Some((_, mut monster)) = monster_query.iter_mut().find(|(loc, _)| *loc == &new_location) {
+                monster.damage(1.0);
+            } else {
+                map_location.col = new_location.col;
+                map_location.row = new_location.row;
+                let global_pos = map_location.global_position();
+                transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+            }
             next_state.set(GameState::MonsterTurn);
         }
     }
