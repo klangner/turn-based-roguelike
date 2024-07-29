@@ -86,14 +86,14 @@ fn make_move(
         monsters_query.iter().map(|(loc, _)| loc.clone()).collect();
 
     for (mut monster_location, mut transform) in monsters_query.iter_mut() {
-        let player_distance = monster_location.distance_to(&player_location);
+        let player_distance = monster_location.distance_to(player_location);
         if player_distance == 1 {
             // Attack player
             player_health.damage(1);
         } else {
             let new_location = if player_distance < 4 {
                 // Follow player
-                monster_location.direction_to(&player_location)
+                monster_location.direction_to(player_location)
             } else {
                 // Move in random direction
                 random_location(&monster_location)

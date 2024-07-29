@@ -38,7 +38,7 @@ fn spawn_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        width: Val::Px(WINDOW_WIDTH as f32),
+                        width: Val::Px(WINDOW_WIDTH),
                         height: Val::Px(32.0),
                         margin: UiRect::px(0.0, 0.0, 0., 0.),
                         ..default()
