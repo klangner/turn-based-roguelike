@@ -2,6 +2,7 @@ use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
 use crate::actions::Actions;
+use crate::health::Health;
 use crate::level::{MapLocation, TileMap};
 use crate::monsters::Monster;
 use crate::resources::RoguesTextureAtlas;
@@ -41,13 +42,14 @@ fn setup_player(mut commands: Commands, handle: Res<RoguesTextureAtlas>, tilemap
                 layout: handle.layout.clone().unwrap(),
                 index: 0,
             },
+            Health::new(10),
         ))
         .insert(Player);
 }
 
 fn player_turn(
     mut player_query: Query<(&mut MapLocation, &mut Transform), With<Player>>,
-    mut monster_query: Query<(&MapLocation, &mut Monster), Without<Player>>,
+    mut monster_query: Query<(&MapLocation, &mut Health), (With<Monster>, Without<Player>)>,
     tilemap: Res<TileMap>,
     actions: Res<Actions>,
     mut next_state: ResMut<NextState<GameState>>,
@@ -78,7 +80,7 @@ fn player_turn(
                 .iter_mut()
                 .find(|(loc, _)| *loc == &new_location)
             {
-                monster.damage(1.0);
+                monster.damage(1);
             } else {
                 map_location.col = new_location.col;
                 map_location.row = new_location.row;

@@ -1,6 +1,7 @@
 use bevy::math::vec3;
 use bevy::{prelude::*, sprite::Anchor};
 
+use crate::health::Health;
 use crate::level::{MapLocation, TileMap};
 use crate::player::Player;
 use crate::resources::MonstersTextureAtlas;
@@ -9,14 +10,9 @@ use crate::state::GameState;
 pub struct MonsterPlugin;
 
 #[derive(Component)]
-pub struct Monster {
-    pub health: f32,
-}
+pub struct Monster;
 
 impl Monster {
-    pub fn damage(&mut self, amount: f32) {
-        self.health -= amount;
-    }
 }
 
 impl Plugin for MonsterPlugin {
@@ -51,8 +47,9 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
                 layout: handle.layout.clone().unwrap(),
                 index: 0,
             },
-            Monster { health: 1.0 },
-        ));
+            Health::new(1),
+        ))
+        .insert(Monster);
     }
 }
 
@@ -130,10 +127,10 @@ fn make_move(
 
 fn despawn_dead_enemies(
     mut commands: Commands,
-    enemy_query: Query<(&Monster, Entity), With<Monster>>,
+    enemy_query: Query<(&Health, Entity), With<Monster>>,
 ) {
     for (enemy, entity) in enemy_query.iter() {
-        if enemy.health <= 0.0 {
+        if enemy.is_dead() {
             commands.entity(entity).despawn();
         }
     }

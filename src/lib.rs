@@ -3,6 +3,7 @@
 mod actions;
 mod camera;
 pub mod configs;
+pub mod health;
 mod level;
 mod monsters;
 mod player;
