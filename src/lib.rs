@@ -4,6 +4,7 @@ mod actions;
 mod camera;
 pub mod configs;
 pub mod health;
+mod hud;
 mod level;
 mod monsters;
 mod player;
@@ -15,6 +16,7 @@ use crate::resources::ResourcesPlugin;
 use actions::ActionsPlugin;
 use bevy::prelude::*;
 use camera::FollowCameraPlugin;
+use hud::HudPlugin;
 use level::LevelPlugin;
 use monsters::MonsterPlugin;
 use player::PlayerPlugin;
@@ -31,6 +33,7 @@ impl Plugin for GamePlugin {
             MonsterPlugin,
             PlayerPlugin,
             FollowCameraPlugin,
+            HudPlugin,
         ));
     }
 }

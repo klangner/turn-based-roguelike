@@ -47,7 +47,7 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
                 layout: handle.layout.clone().unwrap(),
                 index: 0,
             },
-            Health::new(1),
+            Health::new(5),
         ))
         .insert(Monster);
     }
@@ -73,7 +73,7 @@ fn spawn_location(_num: u32, tilemap: &Res<TileMap>, player_pos: &UVec2) -> Vec<
 
 fn make_move(
     mut monsters_query: Query<(&mut MapLocation, &mut Transform), With<Monster>>,
-    player_query: Query<&mut MapLocation, (With<Player>, Without<Monster>)>,
+    mut player_query: Query<(&MapLocation, &mut Health), (With<Player>, Without<Monster>)>,
     tilemap: Res<TileMap>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
@@ -81,44 +81,33 @@ fn make_move(
         return;
     }
 
-    let player_location = player_query.single();
-    let mut taken_locations: Vec<MapLocation> =
+    let (player_location, mut player_health) = player_query.single_mut();
+    let taken_locations: Vec<MapLocation> =
         monsters_query.iter().map(|(loc, _)| loc.clone()).collect();
 
-    taken_locations.push(player_location.clone());
-
     for (mut monster_location, mut transform) in monsters_query.iter_mut() {
-        let new_location = match fastrand::choice(0..5).unwrap() {
-            1 => MapLocation {
-                col: monster_location.col + 1,
-                row: monster_location.row,
-            },
-            2 => MapLocation {
-                col: monster_location.col,
-                row: monster_location.row + 1,
-            },
-            3 => MapLocation {
-                col: monster_location.col - 1,
-                row: monster_location.row,
-            },
-            4 => MapLocation {
-                col: monster_location.col,
-                row: monster_location.row - 1,
-            },
-            _ => MapLocation {
-                col: monster_location.col,
-                row: monster_location.row,
-            },
-        };
+        let player_distance = monster_location.distance_to(&player_location);
+        if player_distance == 1 {
+            // Attack player
+            player_health.damage(1);
+        } else {
+            let new_location = if player_distance < 4 {
+                // Follow player
+                monster_location.direction_to(&player_location)
+            } else {
+                // Move in random direction
+                random_location(&monster_location)
+            };
 
-        if new_location != *monster_location
-            && tilemap.is_walkable(new_location.col, new_location.row)
-            && taken_locations.iter().all(|l| &new_location != l)
-        {
-            monster_location.col = new_location.col;
-            monster_location.row = new_location.row;
-            let global_pos = monster_location.global_position();
-            transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+            if new_location != *monster_location
+                && tilemap.is_walkable(new_location.col, new_location.row)
+                && taken_locations.iter().all(|l| &new_location != l)
+            {
+                monster_location.col = new_location.col;
+                monster_location.row = new_location.row;
+                let global_pos = monster_location.global_position();
+                transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+            }
         }
     }
 
@@ -134,4 +123,17 @@ fn despawn_dead_enemies(
             commands.entity(entity).despawn();
         }
     }
+}
+
+fn random_location(location: &MapLocation) -> MapLocation {
+    let mut next_location = location.clone();
+    match fastrand::choice(0..5).unwrap() {
+        1 => next_location.col += 1,
+        2 => next_location.row += 1,
+        3 => next_location.col -= 1,
+        4 => next_location.row -= 1,
+        _ => {}
+    }
+
+    next_location
 }

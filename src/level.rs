@@ -111,6 +111,25 @@ impl MapLocation {
             ((WORLD_ROWS - 1 - self.row) * TILE_SIZE) as f32,
         )
     }
+
+    pub fn distance_to(&self, other: &MapLocation) -> u32 {
+        self.col.abs_diff(other.col) + self.row.abs_diff(other.row) 
+    }
+
+    pub fn direction_to(&self, other: &MapLocation) -> MapLocation {
+        let mut new_location = self.clone();
+        if new_location.col > other.col {
+            new_location.col -= 1
+        } else if new_location.col < other.col {
+            new_location.col += 1
+        } else if new_location.row < other.row {
+            new_location.row += 1
+        } else if new_location.row > other.row {
+            new_location.row -= 1
+        }
+
+        new_location
+    }
 }
 
 fn finish_update(mut next_state: ResMut<NextState<GameState>>) {
