@@ -113,7 +113,7 @@ impl MapLocation {
     }
 
     pub fn distance_to(&self, other: &MapLocation) -> u32 {
-        self.col.abs_diff(other.col) + self.row.abs_diff(other.row) 
+        self.col.abs_diff(other.col) + self.row.abs_diff(other.row)
     }
 
     pub fn direction_to(&self, other: &MapLocation) -> MapLocation {

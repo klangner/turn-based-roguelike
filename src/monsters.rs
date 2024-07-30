@@ -12,8 +12,7 @@ pub struct MonsterPlugin;
 #[derive(Component)]
 pub struct Monster;
 
-impl Monster {
-}
+impl Monster {}
 
 impl Plugin for MonsterPlugin {
     fn build(&self, app: &mut App) {
@@ -32,24 +31,25 @@ fn setup_monster(mut commands: Commands, handle: Res<MonstersTextureAtlas>, tile
             row: sp.y,
         };
         let global_pos = map_location.global_position();
-        commands.spawn((
-            map_location,
-            SpriteBundle {
-                transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
-                texture: handle.image.clone().unwrap(),
-                sprite: Sprite {
-                    anchor: Anchor::BottomLeft,
-                    ..Default::default()
+        commands
+            .spawn((
+                map_location,
+                SpriteBundle {
+                    transform: Transform::from_xyz(global_pos.x, global_pos.y, 1.0),
+                    texture: handle.image.clone().unwrap(),
+                    sprite: Sprite {
+                        anchor: Anchor::BottomLeft,
+                        ..Default::default()
+                    },
+                    ..default()
                 },
-                ..default()
-            },
-            TextureAtlas {
-                layout: handle.layout.clone().unwrap(),
-                index: 0,
-            },
-            Health::new(5),
-        ))
-        .insert(Monster);
+                TextureAtlas {
+                    layout: handle.layout.clone().unwrap(),
+                    index: 0,
+                },
+                Health::new(5),
+            ))
+            .insert(Monster);
     }
 }
 

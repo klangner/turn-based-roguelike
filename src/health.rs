@@ -1,6 +1,4 @@
-
 use bevy::prelude::*;
-
 
 #[derive(Component)]
 pub struct Health {
@@ -15,7 +13,7 @@ impl Health {
             max_hp,
         }
     }
-    
+
     pub fn damage(&mut self, amount: i32) {
         self.current_hp -= amount;
     }
