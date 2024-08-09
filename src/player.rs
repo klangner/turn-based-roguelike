@@ -67,10 +67,10 @@ fn player_turn(
         if dir.x < 0. && map_location.col > 0 {
             new_location.col = map_location.col - 1;
         }
-        if dir.y < 0. {
+        if dir.y > 0. {
             new_location.row = map_location.row + 1;
         }
-        if dir.y > 0. && map_location.row > 0 {
+        if dir.y < 0. && map_location.row > 0 {
             new_location.row = map_location.row - 1;
         }
 

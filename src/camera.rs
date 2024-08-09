@@ -10,7 +10,7 @@ use crate::{
 pub struct FollowCameraPlugin;
 
 #[derive(Component)]
-struct FollowCamera;
+pub struct FollowCamera;
 
 impl Plugin for FollowCameraPlugin {
     fn build(&self, app: &mut App) {

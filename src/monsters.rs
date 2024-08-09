@@ -62,6 +62,8 @@ fn spawn_location(_num: u32, tilemap: &Res<TileMap>, player_pos: &UVec2) -> Vec<
         UVec2::new(player_pos.x, player_pos.y + 3),
         UVec2::new(player_pos.x - 3, player_pos.y - 3),
         UVec2::new(player_pos.x + 3, player_pos.y + 3),
+        UVec2::new(player_pos.x - 3, player_pos.y + 3),
+        UVec2::new(player_pos.x + 3, player_pos.y - 3),
     ];
 
     points
@@ -82,7 +84,7 @@ fn make_move(
     }
 
     let (player_location, mut player_health) = player_query.single_mut();
-    let taken_locations: Vec<MapLocation> =
+    let mut taken_locations: Vec<MapLocation> =
         monsters_query.iter().map(|(loc, _)| loc.clone()).collect();
 
     for (mut monster_location, mut transform) in monsters_query.iter_mut() {
@@ -107,6 +109,13 @@ fn make_move(
                 monster_location.row = new_location.row;
                 let global_pos = monster_location.global_position();
                 transform.translation = vec3(global_pos.x, global_pos.y, 1.0);
+
+                taken_locations = taken_locations
+                    .iter()
+                    .take_while(|l| **l != *monster_location)
+                    .cloned()
+                    .collect();
+                taken_locations.push(new_location);
             }
         }
     }

@@ -39,7 +39,7 @@ impl Plugin for LevelPlugin {
 impl TileMap {
     fn new() -> Self {
         let walkable_layer = Self::generate_map();
-        let starting_point = AreaStartingPosition::find(XStart::LEFT, YStart::TOP, &walkable_layer);
+        let starting_point = AreaStartingPosition::find(XStart::LEFT, YStart::BOTTOM, &walkable_layer);
 
         Self {
             width: walkable_layer.width,
@@ -71,8 +71,6 @@ impl TileMap {
 fn spawn_tilemap(mut commands: Commands, tilemap: Res<TileMap>, handle: Res<TilesTextureAtlas>) {
     for c in 0..tilemap.width {
         for r in 0..tilemap.height {
-            let x: u32 = c;
-            let y: u32 = WORLD_ROWS - r;
             let index: usize = if tilemap.is_walkable(c, r) {
                 7 * TILES_COLS as usize
             } else {
@@ -82,8 +80,8 @@ fn spawn_tilemap(mut commands: Commands, tilemap: Res<TileMap>, handle: Res<Tile
                 .spawn((
                     SpriteBundle {
                         transform: Transform::from_xyz(
-                            (x * TILE_SIZE) as f32,
-                            ((y - 1) * TILE_SIZE) as f32,
+                            (c * TILE_SIZE) as f32,
+                            (r * TILE_SIZE) as f32,
                             0.0,
                         ),
                         texture: handle.image.clone().unwrap(),
@@ -97,7 +95,7 @@ fn spawn_tilemap(mut commands: Commands, tilemap: Res<TileMap>, handle: Res<Tile
                         layout: handle.layout.clone().unwrap(),
                         index,
                     },
-                    MapLocation { row: y, col: x },
+                    MapLocation { row: r, col: c },
                 ))
                 .insert(Tile);
         }
@@ -108,7 +106,7 @@ impl MapLocation {
     pub fn global_position(&self) -> Vec2 {
         Vec2::new(
             (self.col * TILE_SIZE) as f32,
-            ((WORLD_ROWS - 1 - self.row) * TILE_SIZE) as f32,
+            (self.row * TILE_SIZE) as f32,
         )
     }
 
