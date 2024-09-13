@@ -120,7 +120,11 @@ fn make_move(
         }
     }
 
-    next_state.set(GameState::PlayerTurn);
+    if player_health.is_dead() {
+        next_state.set(GameState::GameOver);
+    } else {
+        next_state.set(GameState::PlayerTurn);
+    }
 }
 
 fn despawn_dead_enemies(

@@ -11,4 +11,6 @@ pub enum GameState {
     PlayerTurn,
     // Run Monster AI
     MonsterTurn,
+    // Game Over
+    GameOver,
 }

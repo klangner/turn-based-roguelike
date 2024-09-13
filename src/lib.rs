@@ -3,6 +3,7 @@
 mod actions;
 mod camera;
 pub mod configs;
+mod game_over;
 pub mod health;
 mod hud;
 mod level;
@@ -16,6 +17,7 @@ use crate::resources::ResourcesPlugin;
 use actions::ActionsPlugin;
 use bevy::prelude::*;
 use camera::FollowCameraPlugin;
+use game_over::GameOverPlugin;
 use hud::HudPlugin;
 use level::LevelPlugin;
 use monsters::MonsterPlugin;
@@ -34,6 +36,7 @@ impl Plugin for GamePlugin {
             PlayerPlugin,
             FollowCameraPlugin,
             HudPlugin,
+            GameOverPlugin,
         ));
     }
 }
